@@ -3,7 +3,10 @@ sys.path.append("")
 import voice_test.voice_recognition_server as vrs
 import time
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5bb9a4cc2191872c57817b63c19a09f05c8a425a
 import requests
 import json
 import base64
