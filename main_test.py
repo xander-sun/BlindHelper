@@ -3,10 +3,6 @@ sys.path.append("")
 import voice_test.voice_recognition_server as vrs
 import time
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 5bb9a4cc2191872c57817b63c19a09f05c8a425a
 import requests
 import json
 import base64
@@ -64,7 +60,7 @@ def cal_locationg(key_location):
         tb = '偏上'
     elif center_y >= 0.4 and center_y <= 0.6:
         tb = '居中'
-    else center_y >0.6:
+    elif center_y >0.6:
         tb = '偏下'
     
     return lr, lr_angle, tb
