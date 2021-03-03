@@ -1,6 +1,6 @@
 import sys
 sys.path.append("")
-import voice_test.voice_recognition_server as vrs
+import voice_recognition_server as vrs
 import time
 
 import requests
@@ -23,12 +23,19 @@ from io import StringIO
 
 sys.path.append("/home/ys/train_model/models/research/object_detection")
 sys.path.append("/home/ys/discovery_cup/voice_snowboy/test")
-from utils import ops as utils_ops
+#from utils import ops as utils_ops
 if tf.__version__ < '1.4.0':
   raise ImportError('Please upgrade your tensorflow installation to v1.4.* or later!')
 
 from utils import label_map_util
 from utils import visualization_utils as vis_util
+
+rec_words = {'香蕉':'banana',
+             '苹果':'apple',
+             '人':'person',
+             '手机':'phone',
+             '衣服':'cloth'
+            }
 
 def callback_start_wav2word():
 
@@ -37,33 +44,38 @@ def callback_start_wav2word():
     key_word = wav2str()
     #key_word = '香蕉'
     print(key_word)
-    key_location = find_obj_in_camera(key_word)
-    print(key_location)
-    lr, lr_angel, tb = cal_location(key_location)
+    key_locations = find_obj_in_camera(key_word)
+    print(key_locations[0])
+    lr, lr_angle, tb = cal_location(key_locations)
     print(lr, lr_angle, tb)
     str2voice_play(key_word, lr, lr_angle, tb)
 
-def cal_locationg(key_location):
-    center_x = (key_location[0] + key_location[2]) / 2.0
-    center_y = (key_location[1] + key_location[3]) / 2.0
-    lr = None
-    lr_angle = 0
-    tb = None
-    if center_x <= 0.5:
-        lr = '偏左'
-        lr_angle = (0.5 - center_x) / 0.5 * 90
+
+def cal_location(key_locations):
+    if key_locations is None:
+        return None, None, None
     else:
-        lr = '偏右'
-        lr_angle = (center_x - 0.5) / 0.5 * 90
-    
-    if center_y < 0.4:
-        tb = '偏上'
-    elif center_y >= 0.4 and center_y <= 0.6:
-        tb = '居中'
-    elif center_y >0.6:
-        tb = '偏下'
-    
-    return lr, lr_angle, tb
+        key_location = key_locations[0]
+        center_x = (key_location[0] + key_location[2]) / 2.0
+        center_y = (key_location[1] + key_location[3]) / 2.0
+        lr = None
+        lr_angle = 0
+        tb = None
+        if center_x <= 0.5:
+            lr = '偏左'
+            lr_angle = (0.5 - center_x) / 0.5 * 90
+        else:
+            lr = '偏右'
+            lr_angle = (center_x - 0.5) / 0.5 * 90
+
+        if center_y < 0.4:
+            tb = '偏上'
+        elif center_y >= 0.4 and center_y <= 0.6:
+            tb = '居中'
+        elif center_y > 0.6:
+            tb = '偏下'
+
+        return lr, int(lr_angle), tb
 
 import pyttsx3
 
@@ -74,7 +86,7 @@ def str2voice_play(key_word, lr, lr_angle, tb):
     rate = engine.getProperty('rate')
     print(f'语音速率：{rate}')
     # 设置新的语音速率
-    engine.setProperty('rate', 200)
+    engine.setProperty('rate', 150)
     # 获取当前语音音量
     volume = engine.getProperty('volume')
     print(f'语音音量：{volume}')
@@ -82,6 +94,7 @@ def str2voice_play(key_word, lr, lr_angle, tb):
     engine.setProperty('volume', 1.0)
     # 获取当前语音声音的详细信息
     voices = engine.getProperty('voices')
+    #print(f'语音声音详细信息：{voices}')
     # 设置当前语音声音为女性，当前声音不能读中文
     engine.setProperty('voice', 'zh')
     # 设置当前语音声音为男性，当前声音可以读中文
@@ -89,11 +102,22 @@ def str2voice_play(key_word, lr, lr_angle, tb):
     # 获取当前语音声音
     voice = engine.getProperty('voice')
     print(f'语音声音：{voice}')
+    # 语音文本
+    #path = 'test.txt'
+    #with open(path, encoding='utf-8') as f_name:
+    #    words = str(f_name.readlines()).replace(r'\n', '')
     # 将语音文本说出来
-    words = key_word + "在设备" + lr + str(lr_angle) + "度角并且" + tb + "位置"
+    if lr is None:
+        words = "没有找到您说的物品，请调整摄像头"
+    else:
+        words = key_word + "在设备" + lr + str(lr_angle) + "度角并且" + tb + "位置"
     engine.say(words)
     engine.runAndWait()
     engine.stop()
+
+
+###########启动百度线上短语音识别服务############
+token = vrs.fetch_token()
 
 def wav2str():
     #### 录音并保存，静音时停止
@@ -117,18 +141,14 @@ def wav2str():
         result = json.loads(result_str)
         print(result['result'])
 
-        for key_word in rec_words:
+        for key_word in rec_words.keys():
             if key_word in result['result'][0]:
                 print('识别到：',key_word)
                 print(result_str)
                 print(result['result'])
                 return key_word
 
-
-rec_words = ['香蕉','苹果','人','手机','衣服']
-
-token = vrs.fetch_token()
-
+#########目标检测任务相关设置#######################
 # What model to download.
 MODEL_NAME = 'object_detection_ipython/ssd_mobilenet_v1_coco_2017_11_17'
 
@@ -148,18 +168,20 @@ with detection_graph.as_default():
     serialized_graph = fid.read()
     od_graph_def.ParseFromString(serialized_graph)
     tf.import_graph_def(od_graph_def, name='')
-
+    
 label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
 categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
 category_index = label_map_util.create_category_index(categories)
 
 import cv2
+import time
+
 def find_obj_in_camera(key_word):
     cap = cv2.VideoCapture(0)  #### choose camera id by  private computer
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 800)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 600)
     cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('M', 'J', 'P', 'G'))
-
+    time_init = time.time()
     with detection_graph.as_default():
         with tf.compat.v1.Session() as sess:
 
@@ -190,23 +212,28 @@ def find_obj_in_camera(key_word):
                 cv2.imshow('object detection', cv2.resize(frame, (800, 600)))
                 time_end=time.time()
                 print('time cost',(time_end-time_start)*1000,'ms')
-
+                if (time_end - time_init) >= 10:
+                    cap.release()
+                    cv2.destroyAllWindows()
+                    return None
+                
                 Hit_rec = []
                 for idx, score in enumerate(scores[0]):
                     if score >= 0.5:
                         cls = int(classes[0][idx])
                         print(idx, classes[0][idx])
                 #    if key_word in category_index[cls]['name']:
-                        if "person" in category_index[cls]['name']:
+                        if rec_words[key_word] in category_index[cls]['name']:
                             Hit_rec.append(boxes[0][cls])
                     else:
                         break
                 if Hit_rec is not None:
                     print("find object")
                     print(Hit_rec)
-
+                    cap.release()
+                    cv2.destroyAllWindows()
                     return(Hit_rec)
-
+                       
                 if cv2.waitKey(25) & 0xFF == ord('q'):
                     cv2.destroyAllWindows()
                     return()
@@ -214,11 +241,13 @@ def find_obj_in_camera(key_word):
     cap.release()
     cv2.destroyAllWindows()
 
-##########################################################################
+#####################
+########语音关键词开机#################
 import snowboydecoder
 import signal
 
 interrupted = False
+
 
 def signal_handler(signal, frame):
     global interrupted
@@ -229,8 +258,13 @@ def interrupt_callback():
     global interrupted
     return interrupted
 
+#if len(sys.argv) == 1:
+#    print("Error: need to specify model name")
+#    print("Usage: python demo.py your.model")
+#    sys.exit(-1)
+
 #model = sys.argv[1]
-model = "/home/ys/discovery_cup/voice_snowboy/test/hotword.pmdl"
+model = "voice_snowboy/test/hotword.pmdl"
 # capture SIGINT signal, e.g., Ctrl+C
 signal.signal(signal.SIGINT, signal_handler)
 
@@ -243,6 +277,4 @@ detector.start(detected_callback=callback_start_wav2word,
                sleep_time=0.03)
 
 detector.terminate()
-
-
 
