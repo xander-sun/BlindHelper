@@ -22,6 +22,8 @@
    技术文档https://ai.baidu.com/ai-doc/SPEECH/Vk38lxily
 
    Demo:  **https://github.com/Baidu-AIP/speech-demo**
+   
+6. 目前只支持Ubuntu18系统，其他系统测试中
 
    
 
