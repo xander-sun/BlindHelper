@@ -30,11 +30,39 @@ if tf.__version__ < '1.4.0':
 from utils import label_map_util
 from utils import visualization_utils as vis_util
 
-rec_words = {'香蕉':'banana',
-             '苹果':'apple',
-             '人':'person',
-             '手机':'phone',
-             '衣服':'cloth'
+rec_words = {
+            '杯子': 'cup',
+            '药片': 'medicine',
+            '衣服': 'clothes',
+            '鞋子': 'shoes',
+            '面包': 'bread',
+            '牛奶': 'milk',
+            '碗': 'bowl',
+            '筷子': 'chopsticks',
+            '充电器': 'charger',
+            '化妆品': 'cosmetics',
+            '椅子': 'chair',
+            '门': 'door',
+            '遥控器': 'remote control',
+            '床': 'bed',
+            '钱包': 'wallet',
+            '手机': 'phone',
+            '帽子': 'hat',
+            '眼镜': 'glasses',
+            '笔': 'pen',
+            '钱': 'money',
+            '卡片': 'card',
+            '插座': 'socket',
+            '拐棍': 'staff',
+            '钥匙': 'key',
+            '雨伞': 'umbrella',
+            '狗': 'dog'
+        
+        #'香蕉':'banana',
+        #     '苹果':'apple',
+        #     '人':'person',
+        #     '手机':'phone',
+        #     '衣服':'cloth'
             }
 
 def callback_start_wav2word():
