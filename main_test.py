@@ -45,7 +45,7 @@ def callback_start_wav2word():
     #key_word = '香蕉'
     print(key_word)
     key_locations = find_obj_in_camera(key_word)
-    print(key_locations[0])
+    print(key_locations)
     lr, lr_angle, tb = cal_location(key_locations)
     print(lr, lr_angle, tb)
     str2voice_play(key_word, lr, lr_angle, tb)
@@ -153,10 +153,11 @@ def wav2str():
 MODEL_NAME = 'object_detection_ipython/ssd_mobilenet_v1_coco_2017_11_17'
 
 # Path to frozen detection graph. This is the actual model that is used for the object detection.
-PATH_TO_CKPT = MODEL_NAME + '/frozen_inference_graph.pb'
+PATH_TO_CKPT = MODEL_NAME + '/frozen_inference_graph_v1.pb'
 
 # List of the strings that is used to add correct label for each box.
-PATH_TO_LABELS = os.path.join('/home/ys/train_model/models/research/object_detection/data', 'mscoco_label_map.pbtxt')
+#PATH_TO_LABELS = os.path.join('/home/ys/train_model/models/research/object_detection/data', 'mscoco_label_map.pbtxt')
+PATH_TO_LABELS = '/home/ys/discovery_cup/tbh_20210301_tfrecord/tbh_label_map.pbtxt'
 
 NUM_CLASSES = 90
 
@@ -215,7 +216,7 @@ def find_obj_in_camera(key_word):
                 if (time_end - time_init) >= 10:
                     cap.release()
                     cv2.destroyAllWindows()
-                    return None
+                    return(None)
                 
                 Hit_rec = []
                 for idx, score in enumerate(scores[0]):
@@ -236,7 +237,7 @@ def find_obj_in_camera(key_word):
                        
                 if cv2.waitKey(25) & 0xFF == ord('q'):
                     cv2.destroyAllWindows()
-                    return()
+                    return(None)
 
     cap.release()
     cv2.destroyAllWindows()

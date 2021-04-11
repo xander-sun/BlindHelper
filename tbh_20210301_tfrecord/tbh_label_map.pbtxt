@@ -1,0 +1,136 @@
+item {
+  id: 1
+  name: 'cup'
+}
+
+item {
+  id: 2
+  name: 'medicine'
+}
+
+item {
+  id: 3
+  name: 'clothes'
+}
+
+item {
+  id: 4
+  name: 'shoes'
+}
+
+item {
+  id: 5
+  name: 'bread'
+}
+
+item {
+  id: 6
+  name: 'milk'
+}
+
+item {
+  id: 7
+  name: 'bowl'
+}
+
+item {
+  id: 8
+  name: 'chopsticks'
+}
+
+item {
+  id: 9
+  name: 'charger'
+}
+
+item {
+  id: 10
+  name: 'cosmetics'
+}
+
+item {
+  id: 11
+  name: 'chair'
+}
+
+item {
+  id: 12
+  name: 'door'
+}
+
+item {
+  id: 13
+  name: 'remote control'
+}
+
+item {
+  id: 14
+  name: 'bed'
+}
+
+item {
+  id: 15
+  name: 'wallet'
+}
+
+item {
+  id: 16
+  name: 'phone'
+}
+
+item {
+  id: 17
+  name: 'hat'
+}
+
+item {
+  id: 18
+  name: 'glasses'
+}
+
+item {
+  id: 19
+  name: 'pen'
+}
+
+item {
+  id: 20
+  name: 'money'
+}
+
+item {
+  id: 21
+  name: 'card'
+}
+
+item {
+  id: 22
+  name: 'socket'
+}
+
+item {
+  id: 23
+  name: 'staff'
+}
+
+item {
+  id: 24
+  name: 'key'
+}
+
+item {
+  id: 25
+  name: 'umbrella'
+}
+
+item {
+  id: 26
+  name: 'dog'
+}
+
+item {
+  id: 27
+  name: 'plug'
+}
+
+
